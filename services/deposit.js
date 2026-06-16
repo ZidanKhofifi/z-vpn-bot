@@ -78,6 +78,24 @@ function updateDepositStatus(
   saveDB();
 }
 
+function updateDepositMessageId(transactionId, messageId) {
+  const db = getDB();
+
+  db.run(
+    `
+    UPDATE deposits
+    SET qris_message_id = ?
+    WHERE transaction_id = ?
+  `,
+    [
+      Number(messageId),
+      transactionId
+    ]
+  );
+
+  saveDB();
+}
+
 function markDepositPaid(transactionId) {
   const db = getDB();
 
@@ -122,5 +140,6 @@ module.exports = {
   createDeposit,
   getDepositByTransactionId,
   updateDepositStatus,
+  updateDepositMessageId,
   markDepositPaid
 };

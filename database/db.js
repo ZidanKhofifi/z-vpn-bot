@@ -133,6 +133,7 @@ function runMigrations() {
   addColumnIfNotExists("deposits", "transaction_id", "TEXT");
   addColumnIfNotExists("deposits", "order_id", "TEXT");
   addColumnIfNotExists("deposits", "amount", "INTEGER");
+  addColumnIfNotExists("deposits", "qris_message_id", "INTEGER");
   addColumnIfNotExists("deposits", "status", "TEXT DEFAULT 'pending'");
   addColumnIfNotExists(
   "notifications",

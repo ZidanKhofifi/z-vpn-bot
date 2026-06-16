@@ -1,6 +1,10 @@
 const { Scenes, Markup } = require("telegraf");
 const { generateQris } = require("../services/payment");
-const { createDeposit } = require("../services/deposit");
+const {
+  createDeposit,
+  updateDepositMessageId
+} = require("../services/deposit");
+
 
 function formatRupiah(number) {
   return Number(number || 0).toLocaleString("id-ID");
@@ -60,7 +64,7 @@ Contoh:
         qr_url: data.qr_url
       });
 
-      await ctx.replyWithPhoto(
+      const qrisMessage = await ctx.replyWithPhoto(
   { url: data.qr_url },
   {
     caption:
@@ -88,6 +92,11 @@ Silakan scan QRIS di atas.`,
   ]
 }
   }
+);
+
+      updateDepositMessageId(
+  data.transaction_id,
+  qrisMessage.message_id
 );
 
       return ctx.scene.leave();

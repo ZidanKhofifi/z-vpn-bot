@@ -156,6 +156,13 @@ if (!["settlement", "paid"].includes(status)) {
 
 const paid = markDepositPaid(transactionId);
 
+        if (paid.success && paid.deposit.qris_message_id) {
+  await bot.telegram.deleteMessage(
+    paid.deposit.telegram_id,
+    paid.deposit.qris_message_id
+  ).catch(() => {});
+        }
+
         console.log("MARK RESULT:", paid);
 
         if (!paid.success) {
