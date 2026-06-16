@@ -2,10 +2,10 @@ const { Markup } = require("telegraf");
 const { getUser } = require("../services/user");
 const mainMenu = require("../keyboards/main");
 const { checkQrisStatus } = require("../services/payment");
-const { markDepositPaid } = require("../services/deposit");
 const {
   getDepositByTransactionId,
-  updateDepositStatus
+  updateDepositStatus,
+  markDepositPaid
 } = require("../services/deposit");
 const { cancelQris } = require("../services/payment");
 const {
@@ -107,46 +107,140 @@ Pilih menu:`,
   try {
     const response = await checkQrisStatus(transactionId);
 
-    const status =
+    let status =
       response?.data?.transaction_status ||
       response?.data?.status ||
       "pending";
 
-    if (status !== "settlement") {
-      return ctx.answerCbQuery(`Status: ${status}`, {
-        show_alert: true
-      });
+    status = String(status).toUpperCase();
+
+    // =========================
+    // MASIH MENUNGGU PEMBAYARAN
+    // =========================
+    if (status === "PENDING") {
+      return ctx.answerCbQuery(
+        "⏳ Pembayaran belum diterima.",
+        {
+          show_alert: true
+        }
+      );
     }
 
-    const paid = markDepositPaid(transactionId);
 
-    if (!paid.success) {
-      return ctx.answerCbQuery(paid.message, {
-        show_alert: true
-      });
-    }
+    // =========================
+    // PEMBAYARAN BERHASIL
+    // =========================
+    if (
+      status === "PAID" ||
+      status === "SETTLEMENT"
+    ) {
 
-    addBalance(
-      paid.deposit.telegram_id,
-      Number(paid.deposit.amount),
-      `Deposit QRIS ${transactionId}`
-    );
+      const paid = markDepositPaid(transactionId);
 
-    await ctx.deleteMessage().catch(() => {});
+      if (!paid.success) {
+        return ctx.answerCbQuery(
+          paid.message,
+          {
+            show_alert: true
+          }
+        );
+      }
 
-return ctx.reply(
+      addBalance(
+        paid.deposit.telegram_id,
+        Number(paid.deposit.amount),
+        `Deposit QRIS ${transactionId}`
+      );
+
+
+      // Hapus QRIS lama
+      await ctx.deleteMessage().catch(() => {});
+
+
+      return ctx.reply(
 `✅ DEPOSIT BERHASIL
 
-Nominal : Rp${Number(paid.deposit.amount).toLocaleString("id-ID")}
+Nominal : Rp${Number(paid.deposit.amount)
+.toLocaleString("id-ID")}
 
 Saldo sudah masuk.`,
-  Markup.inlineKeyboard([
-    [Markup.button.callback("💰 Cek Saldo", "saldo")],
-    [Markup.button.callback("🏠 Home", "home")]
-  ])
-);
+        Markup.inlineKeyboard([
+          [
+            Markup.button.callback(
+              "💰 Cek Saldo",
+              "saldo"
+            )
+          ],
+          [
+            Markup.button.callback(
+              "🏠 Home",
+              "home"
+            )
+          ]
+        ])
+      );
+    }
+
+
+    // =========================
+    // QRIS KADALUWARSA / BATAL
+    // =========================
+    if (
+      status === "CANCEL" ||
+      status === "EXPIRED"
+    ) {
+
+      updateDepositStatus(
+        transactionId,
+        "cancel"
+      );
+
+      await ctx.deleteMessage().catch(() => {});
+
+      return ctx.reply(
+`❌ QRIS SUDAH TIDAK BERLAKU
+
+Status:
+${status}
+
+Silakan buat deposit baru.`,
+        Markup.inlineKeyboard([
+          [
+            Markup.button.callback(
+              "➕ Buat Deposit Baru",
+              "deposit"
+            )
+          ],
+          [
+            Markup.button.callback(
+              "🏠 Home",
+              "home"
+            )
+          ]
+        ])
+      );
+    }
+
+
+    // =========================
+    // STATUS TIDAK DIKENAL
+    // =========================
+    return ctx.answerCbQuery(
+      `Status: ${status}`,
+      {
+        show_alert: true
+      }
+    );
+
+
   } catch (err) {
-    return ctx.reply(`❌ Gagal cek deposit\n\n${err.message}`);
+
+    return ctx.reply(
+`❌ Gagal cek deposit
+
+${err.message}`
+    );
+
   }
 });
 
