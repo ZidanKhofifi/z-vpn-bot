@@ -140,17 +140,21 @@ if (body.event !== "transaction.received") {
 
 const tx = body.transaction;
 
-console.log("TX ID:", tx.id);
+const transactionId =
+  tx.id ||
+  tx.transaction_id;
+
+const status = String(tx.status || "").toLowerCase();
+
+console.log("TX ID:", transactionId);
 console.log("STATUS:", tx.status);
 console.log("AMOUNT:", tx.amount);
 
-        if (tx.status !== "settlement") {
-          return res.json({ success: true });
-        }
+if (!["settlement", "paid"].includes(status)) {
+  return res.json({ success: true });
+}
 
-        console.log("AUTOGOPAY TX ID:", tx.id);
-
-        const paid = markDepositPaid(tx.id);
+const paid = markDepositPaid(transactionId);
 
         console.log("MARK RESULT:", paid);
 
@@ -166,7 +170,7 @@ console.log("AMOUNT:", tx.amount);
         addBalance(
           paid.deposit.telegram_id,
           Number(paid.deposit.amount),
-          `Deposit QRIS ${tx.id}`
+          `Deposit QRIS ${transactionId}`
         );
 
         await bot.telegram.sendMessage(
