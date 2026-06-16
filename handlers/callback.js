@@ -100,7 +100,7 @@ Pilih menu:`,
 });
 
   bot.action(/^deposit_check_(.+)$/, async (ctx) => {
-  await ctx.answerCbQuery();
+  
 
   const transactionId = ctx.match[1];
 
