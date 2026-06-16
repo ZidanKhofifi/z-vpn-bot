@@ -130,17 +130,29 @@ function startWebhookServer(bot) {
 
         const body = JSON.parse(rawBody);
 
-        if (body.event !== "transaction.received") {
-          return res.json({ success: true });
-        }
+console.log("=== AUTOGOPAY WEBHOOK MASUK ===");
+console.log("BODY:", body);
 
-        const tx = body.transaction;
+if (body.event !== "transaction.received") {
+  console.log("EVENT DILEWATI:", body.event);
+  return res.json({ success: true });
+}
+
+const tx = body.transaction;
+
+console.log("TX ID:", tx.id);
+console.log("STATUS:", tx.status);
+console.log("AMOUNT:", tx.amount);
 
         if (tx.status !== "settlement") {
           return res.json({ success: true });
         }
 
+        console.log("AUTOGOPAY TX ID:", tx.id);
+
         const paid = markDepositPaid(tx.id);
+
+        console.log("MARK RESULT:", paid);
 
         if (!paid.success) {
           return res.json({
@@ -148,6 +160,8 @@ function startWebhookServer(bot) {
             message: paid.message
           });
         }
+
+        console.log("Menambah saldo ke:", paid.deposit.telegram_id);
 
         addBalance(
           paid.deposit.telegram_id,

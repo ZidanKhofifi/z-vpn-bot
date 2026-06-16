@@ -15,8 +15,6 @@ function api() {
 }
 
 async function generateQris(amount) {
-  console.log("PAYMENT KEY:", API_KEY ? "ADA" : "KOSONG");
-console.log("PAYMENT BASE:", BASE_URL);
   const res = await api().post("/qris/generate", {
     amount: Number(amount)
   });
