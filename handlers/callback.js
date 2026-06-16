@@ -186,39 +186,27 @@ Saldo sudah masuk.`,
     // QRIS KADALUWARSA / BATAL
     // =========================
     if (
-      status === "CANCEL" ||
-      status === "EXPIRED"
-    ) {
+  status === "CANCEL" ||
+  status === "CANCELED" ||
+  status === "EXPIRED" ||
+  status === "EXPIRE"
+) {
+  updateDepositStatus(transactionId, "cancel");
 
-      updateDepositStatus(
-        transactionId,
-        "cancel"
-      );
+  await ctx.deleteMessage().catch(() => {});
 
-      await ctx.deleteMessage().catch(() => {});
-
-      return ctx.reply(
+  return ctx.reply(
 `❌ QRIS SUDAH TIDAK BERLAKU
 
 Status:
 ${status}
 
 Silakan buat deposit baru.`,
-        Markup.inlineKeyboard([
-          [
-            Markup.button.callback(
-              "➕ Buat Deposit Baru",
-              "deposit"
-            )
-          ],
-          [
-            Markup.button.callback(
-              "🏠 Home",
-              "home"
-            )
-          ]
-        ])
-      );
+    Markup.inlineKeyboard([
+      [Markup.button.callback("➕ Buat Deposit Baru", "deposit")],
+      [Markup.button.callback("🏠 Home", "home")]
+    ])
+  );
     }
 
 
