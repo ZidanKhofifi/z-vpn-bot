@@ -38,12 +38,8 @@ function saveNotification(
   saveDB();
 }
 
-async function sendTopicNotification(bot, text) {
-  if (!process.env.NOTIF_GROUP_ID || !process.env.NOTIF_TOPIC_ID) {
-    return;
-  }
-
-  return bot.telegram.sendMessage(
+async function sendTopicNotification(ctx, text) {
+  return ctx.telegram.sendMessage(
     process.env.NOTIF_GROUP_ID,
     text,
     {

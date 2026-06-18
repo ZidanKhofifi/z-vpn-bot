@@ -388,8 +388,8 @@ Harga      : Rp${formatRupiah(order.price)}`,
 );
 
       await sendTopicNotification(
-  bot,
-`🎉 <b>ORDER BERHASIL</b>
+  ctx,
+  `🎉 <b>ORDER BERHASIL</b>
 
 👤 User : ${ctx.from.username ? "@" + ctx.from.username : ctx.from.first_name}
 🆔 ID : <code>${ctx.from.id}</code>
