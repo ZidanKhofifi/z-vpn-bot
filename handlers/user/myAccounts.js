@@ -407,9 +407,9 @@ Pilih akun yang ingin diperpanjang:`,
 
     if (account.protocol === "ssh") {
       payload = {
-        username: account.username,
-        days
-      };
+  username: account.username,
+  days: String(days)
+};
     } else {
       payload = {
         username: account.username,

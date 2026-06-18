@@ -202,9 +202,9 @@ Harga : Rp${formatRupiah(price)}`
       ) {
 
         payload = {
-          username: account.username,
-          days
-        };
+  username: account.username,
+  days: String(days)
+};
 
       } else {
 
