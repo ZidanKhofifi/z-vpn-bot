@@ -4,6 +4,7 @@ const { createAccount } = require("../services/vpn");
 const { saveAccount } = require("../services/account");
 const { getBalance, reduceBalance, addBalance } = require("../services/balance");
 const { getUser } = require("../services/user");
+const { sendTopicNotification } = require("../services/notification");
 
 function formatRupiah(number) {
   return Number(number || 0).toLocaleString("id-ID");
@@ -384,6 +385,22 @@ Harga      : Rp${formatRupiah(order.price)}`,
       ]
     ]).reply_markup
   }
+);
+
+      await sendTopicNotification(
+  bot,
+`🎉 <b>ORDER BERHASIL</b>
+
+👤 User : ${ctx.from.username ? "@" + ctx.from.username : ctx.from.first_name}
+🆔 ID : <code>${ctx.from.id}</code>
+
+📦 Protocol : <b>${String(response.type || order.protocol).toUpperCase()}</b>
+🌐 Server : <b>${server.name}</b>
+👤 Username VPN : <code>${response.username || order.username}</code>
+⏳ Durasi : <b>${order.days} hari</b>
+📅 Expired : <b>${response.expired_text || response.expired_date || response.expired_at || "-"}</b>
+
+💰 Harga : <b>Rp${formatRupiah(order.price)}</b>`
 );
 
       return ctx.scene.leave();
