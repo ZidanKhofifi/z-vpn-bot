@@ -6,6 +6,7 @@ const {
   hasTrialToday,
   saveTrialLog
 } = require("../../services/trial");
+const { sendTopicNotification } = require("../../services/notification");
 
 function formatConfig(data) {
   let text =
@@ -193,6 +194,21 @@ if (!user || user.role === "user") {
             ]
           ])
         );
+
+        await sendTopicNotification(
+  ctx,
+`🧪 <b>TRIAL ACCOUNT CREATED</b>
+
+<blockquote>
+👤 User       : ${ctx.from.username ? "@" + ctx.from.username : ctx.from.first_name}
+📡 Protocol   : ${protocol.toUpperCase()}
+👤 Username   : ${response.username || "-"}
+⏰ Masa Aktif : 60 Menit
+🌐 Server     : ${server.name}
+</blockquote>
+
+🚀 Selamat mencoba layanan Z VPN Store`
+);
 
       } catch (err) {
         await ctx.reply(

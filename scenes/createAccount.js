@@ -389,18 +389,18 @@ Harga      : Rp${formatRupiah(order.price)}`,
 
       await sendTopicNotification(
   ctx,
-  `🎉 <b>ORDER BERHASIL</b>
+`🎉 <b>ACCOUNT CREATED</b>
 
-👤 User : ${ctx.from.username ? "@" + ctx.from.username : ctx.from.first_name}
-🆔 ID : <code>${ctx.from.id}</code>
+<blockquote>
+👤 User       : ${ctx.from.username ? "@" + ctx.from.username : ctx.from.first_name}
+📡 Protocol   : ${(response.type || order.protocol).toUpperCase()}
+👤 Username   : ${response.username || order.username}
+📅 Expired    : ${response.expired_text || response.expired_date || response.expired_at || "-"}
+🌐 Server     : ${server.name}
+💰 Harga      : Rp${formatRupiah(order.price)}
+</blockquote>
 
-📦 Protocol : <b>${String(response.type || order.protocol).toUpperCase()}</b>
-🌐 Server : <b>${server.name}</b>
-👤 Username VPN : <code>${response.username || order.username}</code>
-⏳ Durasi : <b>${order.days} hari</b>
-📅 Expired : <b>${response.expired_text || response.expired_date || response.expired_at || "-"}</b>
-
-💰 Harga : <b>Rp${formatRupiah(order.price)}</b>`
+✨ Terima kasih telah menggunakan Z VPN Store ❤️`
 );
 
       return ctx.scene.leave();
