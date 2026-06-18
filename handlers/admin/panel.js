@@ -28,9 +28,12 @@ function adminMenu() {
       Markup.button.callback("🗑 Hapus Server", "admin_delete_server")
     ],
     [
-      Markup.button.callback("💰 Tambah Saldo", "admin_add_balance"),
-      Markup.button.callback("👑 Set Reseller", "admin_set_reseller")
-    ],
+  Markup.button.callback("💰 Tambah Saldo", "admin_add_balance"),
+  Markup.button.callback("👥 List User", "admin_list_user_1")
+],
+[
+  Markup.button.callback("👑 Set Reseller", "admin_set_reseller")
+],
     [
   Markup.button.callback("📊 Statistik", "admin_stats"),
   Markup.button.callback("🖥 Monitoring", "admin_monitor")
@@ -74,6 +77,68 @@ Silakan pilih menu admin:`,
         adminMenu()
       );
     });
+
+    bot.action(/^admin_list_user_(\d+)$/, async (ctx) => {
+  if (!isAdmin(ctx)) return;
+
+  await ctx.answerCbQuery();
+
+  const page = Number(ctx.match[1]);
+  const users = getAllUsers();
+
+  const paged = paginate(users, page, 10);
+
+  let text =
+`👥 LIST USER
+
+Total User : ${users.length}
+Page       : ${paged.page}/${paged.totalPages}
+
+━━━━━━━━━━━━━━`;
+
+  if (!users.length) {
+    text += `\n\nBelum ada user.`;
+  } else {
+    paged.data.forEach((user, i) => {
+      text += `
+
+${paged.start + i + 1}. ${user.username ? "@" + user.username : "-"}
+├ ID      : ${user.telegram_id}
+├ Role    : ${user.role || "user"}
+├ Saldo   : Rp${Number(user.balance || 0).toLocaleString("id-ID")}
+└ Status  : ${user.status || "active"}`;
+    });
+  }
+
+  const nav = [];
+
+  if (paged.page > 1) {
+    nav.push(
+      Markup.button.callback(
+        "⬅️ Prev",
+        `admin_list_user_${paged.page - 1}`
+      )
+    );
+  }
+
+  if (paged.page < paged.totalPages) {
+    nav.push(
+      Markup.button.callback(
+        "Next ➡️",
+        `admin_list_user_${paged.page + 1}`
+      )
+    );
+  }
+
+  await ctx.editMessageText(
+    text,
+    Markup.inlineKeyboard([
+      nav,
+      [Markup.button.callback("⚙️ Panel Admin", "panel_admin")],
+      [Markup.button.callback("🏠 Home", "home")]
+    ].filter(row => row.length))
+  );
+});
 
     bot.action("admin_monitor", async (ctx) => {
   if (!isAdmin(ctx)) return;
