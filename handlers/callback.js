@@ -2,6 +2,7 @@ const { Markup } = require("telegraf");
 const { getUser } = require("../services/user");
 const mainMenu = require("../keyboards/main");
 const { checkQrisStatus } = require("../services/payment");
+const { sendTopicNotification } = require("../services/notification");
 const {
   getDepositByTransactionId,
   updateDepositStatus,
@@ -152,6 +153,21 @@ Pilih menu:`,
         `Deposit QRIS ${transactionId}`
       );
 
+      await sendTopicNotification(
+  ctx,
+`✅ <b>TOP UP BERHASIL</b>
+
+<blockquote>
+👤 User          : ${ctx.from.username ? "@" + ctx.from.username : ctx.from.first_name}
+🆔 ID            : ${ctx.from.id}
+💵 Nominal       : Rp${Number(paid.deposit.amount).toLocaleString("id-ID")}
+💳 Metode        : QRIS AutoGoPay
+📌 Status        : ${status}
+</blockquote>
+
+🙏 Terima kasih telah melakukan deposit.`
+);
+
 
       // Hapus QRIS lama
       await ctx.deleteMessage().catch(() => {});
@@ -192,6 +208,21 @@ Saldo sudah masuk.`,
   status === "EXPIRE"
 ) {
   updateDepositStatus(transactionId, "cancel");
+
+      await sendTopicNotification(
+  ctx,
+`❌ <b>DEPOSIT TIDAK BERLAKU</b>
+
+<blockquote>
+👤 User    : ${ctx.from.username ? "@" + ctx.from.username : ctx.from.first_name}
+🆔 ID      : ${ctx.from.id}
+💳 Metode  : QRIS AutoGoPay
+📌 Status  : ${status}
+🧾 TRX ID  : ${transactionId}
+</blockquote>
+
+User perlu membuat deposit baru.`
+);
 
   await ctx.deleteMessage().catch(() => {});
 
@@ -245,6 +276,20 @@ ${err.message}`
     }
 
     updateDepositStatus(transactionId, "cancel");
+
+    await sendTopicNotification(
+  ctx,
+`🚫 <b>DEPOSIT DIBATALKAN</b>
+
+<blockquote>
+👤 User    : ${ctx.from.username ? "@" + ctx.from.username : ctx.from.first_name}
+🆔 ID      : ${ctx.from.id}
+💳 Metode  : QRIS AutoGoPay
+🧾 TRX ID  : ${transactionId}
+</blockquote>
+
+Deposit dibatalkan oleh user.`
+);
 
     await ctx.deleteMessage().catch(() => {});
 
