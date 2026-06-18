@@ -12,6 +12,7 @@ const { restoreDatabase } = require("./services/restore");
 const { syncExpiredAccounts } = require("./services/expired");
 const { markDepositPaid } = require("./services/deposit");
 const { addBalance } = require("./services/balance");
+const { getUser } = require("./services/user");
 const {
   checkExpiringAccounts
 } = require("./services/expiredNotifier");
@@ -178,16 +179,17 @@ const paid = markDepositPaid(transactionId);
           `Deposit QRIS ${transactionId}`
         );
 
+        const user = getUser(paid.deposit.telegram_id);
+
         await sendTopicNotification(
   bot,
 `✅ <b>TOP UP BERHASIL</b>
 
 <blockquote>
-👤 User          : <code>${paid.deposit.telegram_id}</code>
+👤 User          : ${user?.username ? "@" + user.username : "Tidak ada username"}
 💵 Nominal       : Rp${Number(paid.deposit.amount).toLocaleString("id-ID")}
 💳 Metode        : QRIS AutoGoPay
 📌 Status        : ${status.toUpperCase()}
-🧾 Transaction   : ${transactionId}
 </blockquote>
 
 🙏 Terima kasih telah melakukan deposit.`
