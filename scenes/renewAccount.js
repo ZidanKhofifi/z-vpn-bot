@@ -21,6 +21,10 @@ const {
   addBalance
 } = require("../services/balance");
 
+const {
+  sendTopicNotification
+} = require("../services/notification");
+
 function formatRupiah(number) {
   return Number(number || 0).toLocaleString("id-ID");
 }
@@ -239,6 +243,23 @@ Harga : Rp${formatRupiah(price)}`
         response.expired_date || "",
         response.expired_text || ""
       );
+
+      await sendTopicNotification(
+  ctx,
+`🔄 <b>RENEW ACCOUNT</b>
+
+<blockquote>
+👤 User       : ${ctx.from.username ? "@" + ctx.from.username : ctx.from.first_name}
+📡 Protocol   : ${account.protocol.toUpperCase()}
+👤 Username   : ${account.username}
+📅 Tambah     : ${days} Hari
+📆 Expired    : ${response.expired_text || response.expired_date}
+🌐 Server     : ${server.name}
+💰 Harga      : Rp${formatRupiah(price)}
+</blockquote>
+
+🎉 Akun berhasil diperpanjang.`
+);
 
       await ctx.editMessageText(
 `✅ RENEW BERHASIL

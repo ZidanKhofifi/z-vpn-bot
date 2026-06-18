@@ -190,6 +190,7 @@ const paid = markDepositPaid(transactionId);
 💵 Nominal       : Rp${Number(paid.deposit.amount).toLocaleString("id-ID")}
 💳 Metode        : QRIS AutoGoPay
 📌 Status        : ${status.toUpperCase()}
+🧾 TRX ID   : ${transactionId}
 </blockquote>
 
 🙏 Terima kasih telah melakukan deposit.`
