@@ -419,6 +419,12 @@ Pilih akun yang ingin diperpanjang:`,
       };
     }
 
+    console.log("RENEW DEBUG:", {
+  api: server.api_url,
+  protocol: account.protocol,
+  payload
+});
+
     const response = await renewAccount(
       server,
       account.protocol,
