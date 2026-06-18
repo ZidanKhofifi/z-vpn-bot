@@ -93,6 +93,15 @@ const stage = new Scenes.Stage([
 ]);
 
 bot.use(session());
+
+bot.use(async (ctx, next) => {
+  if (ctx.chat && ctx.chat.type !== "private") {
+    return;
+  }
+
+  return next();
+});
+
 bot.use(stage.middleware());
 
 
@@ -366,7 +375,7 @@ setTimeout(() => {
 
   startWebhookServer(bot);
 
-  await bot.launch();
+   bot.launch();
 
   console.log("Bot Online");
 })();
