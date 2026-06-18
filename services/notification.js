@@ -38,8 +38,14 @@ function saveNotification(
   saveDB();
 }
 
-async function sendTopicNotification(ctx, text) {
-  return ctx.telegram.sendMessage(
+async function sendTopicNotification(target, text) {
+  if (!process.env.NOTIF_GROUP_ID || !process.env.NOTIF_TOPIC_ID) {
+    return;
+  }
+
+  const telegram = target.telegram;
+
+  return telegram.sendMessage(
     process.env.NOTIF_GROUP_ID,
     text,
     {
