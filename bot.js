@@ -130,8 +130,7 @@ function startWebhookServer(bot) {
 
         const body = JSON.parse(rawBody);
 
-console.log("=== AUTOGOPAY WEBHOOK MASUK ===");
-console.log("BODY:", body);
+
 
 if (body.event !== "transaction.received") {
   console.log("EVENT DILEWATI:", body.event);
@@ -146,9 +145,7 @@ const transactionId =
 
 const status = String(tx.status || "").toLowerCase();
 
-console.log("TX ID:", transactionId);
-console.log("STATUS:", tx.status);
-console.log("AMOUNT:", tx.amount);
+
 
 if (!["settlement", "paid"].includes(status)) {
   return res.json({ success: true });
@@ -163,7 +160,7 @@ const paid = markDepositPaid(transactionId);
   ).catch(() => {});
         }
 
-        console.log("MARK RESULT:", paid);
+        
 
         if (!paid.success) {
           return res.json({
@@ -172,7 +169,7 @@ const paid = markDepositPaid(transactionId);
           });
         }
 
-        console.log("Menambah saldo ke:", paid.deposit.telegram_id);
+        
 
         addBalance(
           paid.deposit.telegram_id,
@@ -247,7 +244,9 @@ Ketik /cancelrestore untuk membatalkan.`
   );
 });
 
-
+ bot.on("message", (ctx) => {
+  console.log(ctx.update.message);
+});
 
   bot.on("document", async (ctx) => {
 
