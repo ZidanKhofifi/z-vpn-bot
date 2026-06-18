@@ -38,7 +38,23 @@ function saveNotification(
   saveDB();
 }
 
+async function sendTopicNotification(bot, text) {
+  if (!process.env.NOTIF_GROUP_ID || !process.env.NOTIF_TOPIC_ID) {
+    return;
+  }
+
+  return bot.telegram.sendMessage(
+    process.env.NOTIF_GROUP_ID,
+    text,
+    {
+      message_thread_id: Number(process.env.NOTIF_TOPIC_ID),
+      parse_mode: "HTML"
+    }
+  ).catch(() => {});
+}
+
 module.exports = {
   hasNotification,
-  saveNotification
+  saveNotification,
+  sendTopicNotification
 };

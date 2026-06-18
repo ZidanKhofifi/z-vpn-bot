@@ -15,6 +15,7 @@ const { addBalance } = require("./services/balance");
 const {
   checkExpiringAccounts
 } = require("./services/expiredNotifier");
+const { sendTopicNotification } = require("./services/notification");
 const { sendDatabaseBackup } = require("./services/backup");
 const setResellerScene = require("./scenes/setReseller");
 const editServerScene = require("./scenes/editServer");
@@ -244,9 +245,17 @@ Ketik /cancelrestore untuk membatalkan.`
   );
 });
 
- bot.on("message", (ctx) => {
-  console.log(ctx.update.message);
+  bot.command("testnotif", async (ctx) => {
+  await sendTopicNotification(
+    bot,
+`✅ <b>TEST NOTIFIKASI</b>
+
+Bot berhasil kirim pesan ke topik TESTIMONI.`
+  );
+
+  await ctx.reply("✅ Test notif dikirim.");
 });
+
 
   bot.on("document", async (ctx) => {
 
