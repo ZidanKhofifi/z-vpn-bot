@@ -178,6 +178,21 @@ const paid = markDepositPaid(transactionId);
           `Deposit QRIS ${transactionId}`
         );
 
+        await sendTopicNotification(
+  ctx,
+`✅ <b>TOP UP BERHASIL</b>
+
+<blockquote>
+👤 User          : ${ctx.from.username ? "@" + ctx.from.username : ctx.from.first_name}
+🆔 ID            : ${ctx.from.id}
+💵 Nominal       : Rp${Number(paid.deposit.amount).toLocaleString("id-ID")}
+💳 Metode        : QRIS AutoGoPay
+📌 Status        : ${status}
+</blockquote>
+
+🙏 Terima kasih telah melakukan deposit.`
+);
+
         await bot.telegram.sendMessage(
           paid.deposit.telegram_id,
 `✅ DEPOSIT BERHASIL
